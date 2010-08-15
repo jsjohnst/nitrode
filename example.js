@@ -9,8 +9,12 @@ nitrode.createServer(function(req, res) {
     auth: [{
         type: 'basic',
         path: /.+/,
-        user: 'admin',
-        pass: 'admin',
-        realm: 'Admin Supreme Area'
+        callback: function(user, pass) {
+            return {
+                'admin' : 'admin',
+                'user'  : 'password'
+            }[user] == pass;
+        },
+        realm: 'Secure Area'
     }]
 });

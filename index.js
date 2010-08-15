@@ -47,8 +47,7 @@ exports.createServer = function(onrequest, config) {
         auth: [{
             path: '',
             type: 'basic',
-            user: undefined,
-            pass: undefined,
+            callback: function(user, pass) { },
             realm: 'Secure Area'
         }],
         ssl: {
@@ -59,7 +58,7 @@ exports.createServer = function(onrequest, config) {
     */
 }
 
-exports.version = "0.2.1";
+exports.version = "0.2.2";
 
 var Server = exports.Server = function(config) {
 
@@ -149,7 +148,7 @@ Server.prototype.handle = function(req, res) {
 
         var pathname = url.normalize(url.parse(req.url).pathname);
 
-        req.authorize = function(type, user, pass, realm) {
+        req.authorize = function(type, callback, realm) {
 
             if ('authorization' in req.headers) {
                 
@@ -166,7 +165,7 @@ Server.prototype.handle = function(req, res) {
                             .toString('utf8')
                             .split(':');
 
-                        return credentials[0] == user && credentials[1] == pass;
+                        return !! callback.call(self, credentials[0], credentials[1]);
                     }
                 }
             }
@@ -177,16 +176,19 @@ Server.prototype.handle = function(req, res) {
         for (var i in this.config.auth) {
             var obj = this.config.auth[i];
             if (pathname.match(obj.path)) {
-                if ( ! req.authorize(obj.type, obj.user, obj.pass, obj.realm)) {
+                if ( ! req.authorize(obj.type, obj.callback, obj.realm)) {
+                    if ('authorization' in req.headers) {
+                        log.write(req, 'Failed authentication attempt');
+                    }
                     res.writeHead(401, {
                         'Content-Type': 'text/html',
-                        'WWW-Authenticate': 'Basic realm="' + obj.realm + '"'
+                        'WWW-Authenticate': obj.type + ' realm="' + obj.realm + '"'
                     });
                     res.end('<h1>401: Authentication Required</h1>');
                     return;
                 }
                 else {
-                    log.write(req, 'Authenticated as user "' + obj.user + '" in realm "' + obj.realm + '"');
+                    log.write(req, 'Authenticated successfully');
                 }
             }
         }
