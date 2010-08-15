@@ -48,7 +48,8 @@ exports.createServer = function(onrequest, config) {
             path: '',
             type: 'basic',
             user: undefined,
-            pass: undefined
+            pass: undefined,
+            realm: 'Secure Area'
         }],
         ssl: {
             cert: undefined,
@@ -146,6 +147,50 @@ Server.prototype.handle = function(req, res) {
                .replace(/\.+\//, '/');
         }
 
+        var pathname = url.normalize(url.parse(req.url).pathname);
+
+        req.authorize = function(type, user, pass, realm) {
+
+            if ('authorization' in req.headers) {
+                
+                var parts = req.headers.authorization.split(' ');
+
+                if (parts[0].toLowerCase() != type) {
+                    return false;
+                }
+
+                switch(type) {
+                    // TODO: Add digest
+                    case 'basic': {
+                        var credentials = new Buffer(parts[1], 'base64')
+                            .toString('utf8')
+                            .split(':');
+
+                        return credentials[0] == user && credentials[1] == pass;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        for (var i in this.config.auth) {
+            var obj = this.config.auth[i];
+            if (pathname.match(obj.path)) {
+                if ( ! req.authorize(obj.type, obj.user, obj.pass, obj.realm)) {
+                    res.writeHead(401, {
+                        'Content-Type': 'text/html',
+                        'WWW-Authenticate': 'Basic realm="' + obj.realm + '"'
+                    });
+                    res.end('<h1>401: Authentication Required</h1>');
+                    return;
+                }
+                else {
+                    log.write(req, 'Authenticated as user "' + obj.user + '" in realm "' + obj.realm + '"');
+                }
+            }
+        }
+
         res.sendfile = function(file, onresult, onclose) {
 
             var found = false;
@@ -222,7 +267,7 @@ Server.prototype.handle = function(req, res) {
 
         log.write(req, 'Requested url ' + req.url);
 
-        res.sendfile(url.parse(req.url).pathname, function(found) {
+        res.sendfile(pathname, function(found) {
 
             if ( ! found) {
 
