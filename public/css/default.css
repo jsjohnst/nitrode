@@ -1,0 +1,10 @@
+
+body {
+    font-family: Arial, Helvatica;
+}
+
+#wrapper {
+    width: 350px;
+    margin: auto;
+    margin-top: 150px;
+}
