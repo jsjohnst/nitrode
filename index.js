@@ -59,7 +59,7 @@ exports.createServer = function(onrequest, config) {
     */
 }
 
-exports.version = "0.0.2";
+exports.version = "0.2.1";
 
 var Server = exports.Server = function(config) {
 
