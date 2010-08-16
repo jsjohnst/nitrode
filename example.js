@@ -1,13 +1,15 @@
 var nitrode = require('../nitrode');
 
-nitrode.createServer(function(req, res) {
-    res.headers['Content-Type'] = 'text/html';
-    res.send('<h1>Error 404: Page not found!</h1>', 404);
-},
-{
-    pubdir: __dirname + '/public',
+nitrode.createServer({
+    server: {
+        port: 80,
+        expose: true
+    },
+    pubdir: {
+        path: /.+/,
+        location: __dirname + '/public'
+    },
     auth: [{
-        type: 'basic',
         path: /.+/,
         callback: function(user, pass) {
             return {
