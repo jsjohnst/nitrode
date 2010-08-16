@@ -28,12 +28,12 @@ exports.createServer = function(handle, config) {
             host: undefined,
             expose: true,
             error: function(code, message) { }
-        }
+        },
         pubdir: {
-            path: /var/wwwroot/.+/,
+            path: /var/wwwroot/(.+)/,
             cache: 3600 * 24 * 365,
             mimes: { }
-        }
+        },
         vhost: {
           'game.kohark.com': http.createServer(function(req, resp) {})
         },
@@ -81,7 +81,7 @@ var Server = exports.Server = function(config) {
     http.Server.call(this, this.handle);
 }
 
-Server.version = "0.3.0";
+Server.version = "0.3.1";
 
 sys.inherits(Server, http.Server);
 
