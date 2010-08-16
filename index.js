@@ -31,7 +31,7 @@ exports.createServer = function(handle, config) {
         }
         pubdir: {
             path: /var/wwwroot/.+/,
-            cache: 3600,
+            cache: 3600 * 24 * 365,
             mimes: { }
         }
         vhost: {
