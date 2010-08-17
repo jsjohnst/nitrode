@@ -27,12 +27,12 @@ exports.createServer = function(handle, config) {
             port: 80,
             host: undefined,
             expose: true,
-            error: function(code, message) { }
+            error: function(code, message) { },
+            mimes: { }
         },
         pubdir: {
             path: /var/wwwroot/(.+)/,
-            cache: 3600 * 24 * 365,
-            mimes: { }
+            cache: 3600 * 24 * 365
         },
         vhost: {
           'game.kohark.com': http.createServer(function(req, resp) {})
