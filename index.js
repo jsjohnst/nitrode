@@ -27,8 +27,13 @@ exports.createServer = function(handle, config) {
             port: 80,
             host: undefined,
             expose: true,
+            chunked: true,
+            keepalive: true,
             error: function(code, message) { },
             mimes: { }
+        },
+        compress: {
+            mimes: []
         },
         pubdir: {
             path: /var/wwwroot/(.+)/,
@@ -62,13 +67,14 @@ exports.createServer = function(handle, config) {
 var Server = exports.Server = function(config) {
 
     var layers = {
-        server:  {},
-        vhost:   {},
-        rewrite: {},
-        ssl:     [],
-        auth:    [],
-        pubdir:  {},
-        request: {}
+        server:   {},
+        vhost:    {},
+        compress: {},
+        rewrite:  {},
+        ssl:      [],
+        auth:     [],
+        pubdir:   {},
+        request:  {}
     };
 
     this.stack = [];
@@ -88,7 +94,7 @@ sys.inherits(Server, http.Server);
 Server.prototype.handle = function(req, res) {
 
     for (var index in this.stack) {
-
+        
         if (this.stack[index].call(this, req, res, this) === false) {
 
             break;
