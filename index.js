@@ -87,7 +87,7 @@ var Server = exports.Server = function(config) {
     http.Server.call(this, this.handle);
 }
 
-Server.version = "0.3.1";
+Server.version = "0.3.2";
 
 sys.inherits(Server, http.Server);
 
