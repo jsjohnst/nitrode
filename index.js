@@ -59,7 +59,11 @@ exports.createServer = function(handle, config) {
         },
         request: {
             handle: function(req, res) {},
-        }
+        },
+        stats: {
+            interval: 1000, // 1 second
+            callback: function(stats) { }
+        },
     }
     */
 }
@@ -74,14 +78,15 @@ var Server = exports.Server = function(config) {
         ssl:      [],
         auth:     [],
         pubdir:   {},
-        request:  {}
+        request:  {},
+        stats:    {}
     };
 
     this.stack = [];
 
     for (var name in layers) {
         
-        require('./lib/' + name).call(this, config[name] || layers[name]);
+        require('./lib/' + name).call(this, config[name] || layers[name], this);
     }
 
     http.Server.call(this, this.handle);
@@ -94,7 +99,7 @@ sys.inherits(Server, http.Server);
 Server.prototype.handle = function(req, res) {
 
     for (var index in this.stack) {
-        
+
         if (this.stack[index].call(this, req, res, this) === false) {
 
             break;

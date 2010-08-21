@@ -1,6 +1,6 @@
 var nitrode = require('../nitrode');
 
-nitrode.createServer({
+var srv = nitrode.createServer({
     server: {
         port: 80,
         expose: true
@@ -18,5 +18,19 @@ nitrode.createServer({
             }[user] == pass;
         },
         realm: 'Secure Area'
-    }]
+    }],
+    stats: {
+        interval: 1000,
+        callback: function(stats) {
+
+            if (stats.requests > 0) {
+
+                console.log('reqs: ' + stats.requests);
+            }
+        },
+        request: function(stats) {
+
+            console.log('request served in: ' + stats.time / 1000 + ' seconds.');
+        }
+    }
 });
