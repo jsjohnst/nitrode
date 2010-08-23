@@ -64,6 +64,9 @@ exports.createServer = function(handle, config) {
             interval: 1000, // 1 second
             callback: function(stats) { }
         },
+        trottle: {
+            connections: 15000
+        }
     }
     */
 }
