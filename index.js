@@ -30,14 +30,16 @@ exports.createServer = function(handle, config) {
             chunked: true,
             keepalive: true,
             error: function(code, message) { },
-            mimes: { }
+            mimes: { },
+            index: "index.html"
         },
         compress: {
             mimes: []
         },
         pubdir: {
             path: /var/wwwroot/(.+)/,
-            cache: 3600 * 24 * 365
+            cache: 3600 * 24 * 365,
+            ssi: true
         },
         vhost: {
           'game.kohark.com': http.createServer(function(req, resp) {})
@@ -85,24 +87,27 @@ var Server = exports.Server = function(config) {
         stats:    {}
     };
 
-    this.stack = [];
+    this.config = {};
+    this.stack  = [];
 
     for (var name in layers) {
+
+        this.config[name] = config[name] || layers[name];
         
-        require('./lib/' + name).call(this, config[name] || layers[name], this);
+        require('./lib/' + name).call(this, this.config[name], this);
     }
 
     http.Server.call(this, this.handle);
 }
 
-Server.version = "0.3.2";
+Server.version = "0.3.3";
 
 sys.inherits(Server, http.Server);
 
 Server.prototype.handle = function(req, res) {
 
     for (var index in this.stack) {
-
+        
         if (this.stack[index].call(this, req, res, this) === false) {
 
             break;

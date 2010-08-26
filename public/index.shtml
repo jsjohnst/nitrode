@@ -10,5 +10,9 @@
                 Your Nitrode installation is complete, and is working correctly!
             </p>
         </div>
+        <!--#if expr="1==2"-->
+            <!--#echo var="BLALALA"-->
+        <!--#endif-->
+        <!--#include file="include/footer.html"-->
     </body>
 </html>

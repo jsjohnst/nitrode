@@ -7,7 +7,8 @@ var srv = nitrode.createServer({
     },
     pubdir: {
         path: /.+/,
-        location: __dirname + '/public'
+        location: __dirname + '/public',
+        index: 'index.shtml'
     },
     auth: [{
         path: /.+/,
